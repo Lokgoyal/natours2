@@ -76,6 +76,15 @@ exports.deleteTour = async (req, res, next) => {
 
 
 // Handlers (Analytical)
+exports.aliasTopTours = (req, res, next) => {
+    req.query.sort = '-ratingsAverage,price';
+    req.query.fields = 'name,difficulty,maxGroupSize,price,ratingsAverage,summary';
+    req.query.limit = 5;
+    next();
+}
+
+
+
 exports.tourStats = async (req, res, next) => {
 
     const stats = await Tour.aggregate([
