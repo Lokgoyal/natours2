@@ -3,7 +3,7 @@ const AppError = require('./../utils/AppError');
 
 
 
-// Handlers
+// Handlers (CRUD)
 exports.getAllTours = async (req, res, next) => {
 
     const tours = await Tour.find();
@@ -66,5 +66,94 @@ exports.deleteTour = async (req, res, next) => {
     res.status(204).json({
         status : 'success',
         data : null
+    });
+};
+
+
+
+// Handlers (Analytical)
+exports.tourStats = async (req, res, next) => {
+
+    const stats = await Tour.aggregate([
+        {
+            $match : { ratingsAverage : { $gt : 4.5 } }
+        },
+
+        {
+            $group : {
+                _id : '$difficulty',
+                numTours : { $sum : 1 },
+                avgRating : { $avg : '$ratingsAverage' },
+                numRatings : { $sum : '$ratingsQuantity' },
+                avgPrice : { $avg : '$price' },
+                maxPrice : { $max : '$price' },
+                minPrice : { $min : '$price' }
+            }
+        },
+
+        {
+            $sort : { numTours : -1 }
+        },
+
+        {
+            $limit : 5
+        }
+    ]);
+    
+    res.status(200).json({
+        status : 'success',
+        data : { stats }
+    });
+};
+
+
+
+exports.monthlyPlan = async (req, res, next) => {
+
+    const { year } = req.params;
+    const plan = await Tour.aggregate([
+
+        {
+            $unwind : '$startDates'
+        },
+
+        {
+            $match : { startDates : {
+                $gte : new Date(`${year}-01-01`),
+                $lte : new Date(`${year}-12-31`)
+            }}
+        },
+
+        {
+            $group : {
+                _id : { $month : '$startDates' },
+                tours : { $push : '$name' },
+                numTours : { $sum : 1 }
+            }
+        },
+
+        {
+            $addFields : { month : '$_id' }
+        },
+
+        {
+            $sort : {
+                numTours : -1,
+                month : 1,
+            }
+        },
+
+        {
+            $project : { _id : 0 }
+        },
+
+        {
+            $limit : 5
+        }
+    ]);
+
+    res.status(200).json({
+        status : 'success',
+        data : { plan }
     });
 };

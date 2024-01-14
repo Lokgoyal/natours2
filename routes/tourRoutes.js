@@ -8,7 +8,12 @@ const router = express.Router();
 
 
 
-// Mount routes
+// Mount routes (Analytical)
+router.get('/stats', tourController.tourStats);
+router.get('/monthly-plan/:year', tourController.monthlyPlan);
+
+
+// Mount routes (CRUD)
 router.route('/').get(tourController.getAllTours).post(tourController.createTour);
 router.route('/:id').get(tourController.getTour).patch(tourController.updateTour).delete(tourController.deleteTour);
 
