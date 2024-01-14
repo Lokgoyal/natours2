@@ -1,4 +1,5 @@
 const Tour = require('./../models/tourModel');
+const AppError = require('./../utils/AppError');
 
 
 
@@ -18,7 +19,7 @@ exports.getAllTours = async (req, res, next) => {
 exports.createTour = async (req, res, next) => {
 
     const newTour = await Tour.create(req.body);
-    if(!newTour) return next();
+    if(!newTour) return next( new AppError('Unable to create new tour!', 400) );
 
     res.status(201).json({
         status : 'success',
@@ -31,7 +32,7 @@ exports.createTour = async (req, res, next) => {
 exports.getTour = async (req, res, next) => {
 
     const tour = await Tour.findById(req.params.id);
-    if(!tour) return;
+    if(!tour) return next( new AppError(`No tour exist with this Id!`, 404) );
 
     res.status(200).json({
         status : 'success',
@@ -47,7 +48,7 @@ exports.updateTour = async (req, res, next) => {
         new : true,
         runValidators : true
     });
-    if(!updatedTour) return;
+    if(!updatedTour) return next( new AppError(`No tour exist with this Id!`, 404) );
 
     res.status(202).json({
         status : 'success',
@@ -60,7 +61,7 @@ exports.updateTour = async (req, res, next) => {
 exports.deleteTour = async (req, res, next) => {
 
     const deletedTour = await Tour.findByIdAndDelete(req.params.id);
-    if(!deletedTour) return;
+    if(!deletedTour) return next( new AppError(`No tour exist with this Id!`, 404) );
 
     res.status(204).json({
         status : 'success',
