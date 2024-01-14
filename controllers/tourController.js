@@ -1,11 +1,12 @@
 const Tour = require('./../models/tourModel');
 const AppError = require('./../utils/AppError');
+const catchAsync = require('./../utils/catchAsync');
 const APIFeatures = require('./../utils/APIFeatures');
 
 
 
 // Handlers (CRUD)
-exports.getAllTours = async (req, res, next) => {
+exports.getAllTours = catchAsync(async (req, res, next) => {
 
     const urlQueryObj = new APIFeatures(req.query, Tour.find());
     urlQueryObj.filter().sort().project().paginate();
@@ -16,11 +17,11 @@ exports.getAllTours = async (req, res, next) => {
         numTours : tours.length,
         data : { tours }
     });
-};
+});
 
 
 
-exports.createTour = async (req, res, next) => {
+exports.createTour = catchAsync(async (req, res, next) => {
 
     const newTour = await Tour.create(req.body);
     if(!newTour) return next( new AppError('Unable to create new tour!', 400) );
@@ -29,11 +30,11 @@ exports.createTour = async (req, res, next) => {
         status : 'success',
         data : { tour : newTour }
     });
-};
+});
 
 
 
-exports.getTour = async (req, res, next) => {
+exports.getTour = catchAsync(async (req, res, next) => {
 
     const tour = await Tour.findById(req.params.id);
     if(!tour) return next( new AppError(`No tour exist with this Id!`, 404) );
@@ -42,11 +43,11 @@ exports.getTour = async (req, res, next) => {
         status : 'success',
         data : { tour }
     });
-};
+});
 
 
 
-exports.updateTour = async (req, res, next) => {
+exports.updateTour = catchAsync(async (req, res, next) => {
 
     const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
         new : true,
@@ -58,11 +59,11 @@ exports.updateTour = async (req, res, next) => {
         status : 'success',
         data : { tour : updatedTour }
     });
-};
+});
 
 
 
-exports.deleteTour = async (req, res, next) => {
+exports.deleteTour = catchAsync(async (req, res, next) => {
 
     const deletedTour = await Tour.findByIdAndDelete(req.params.id);
     if(!deletedTour) return next( new AppError(`No tour exist with this Id!`, 404) );
@@ -71,7 +72,7 @@ exports.deleteTour = async (req, res, next) => {
         status : 'success',
         data : null
     });
-};
+});
 
 
 
@@ -85,7 +86,7 @@ exports.aliasTopTours = (req, res, next) => {
 
 
 
-exports.tourStats = async (req, res, next) => {
+exports.tourStats = catchAsync(async (req, res, next) => {
 
     const stats = await Tour.aggregate([
         {
@@ -117,11 +118,11 @@ exports.tourStats = async (req, res, next) => {
         status : 'success',
         data : { stats }
     });
-};
+});
 
 
 
-exports.monthlyPlan = async (req, res, next) => {
+exports.monthlyPlan = catchAsync(async (req, res, next) => {
 
     const { year } = req.params;
     const plan = await Tour.aggregate([
@@ -169,4 +170,4 @@ exports.monthlyPlan = async (req, res, next) => {
         status : 'success',
         data : { plan }
     });
-};
+});
