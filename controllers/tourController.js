@@ -1,12 +1,16 @@
 const Tour = require('./../models/tourModel');
 const AppError = require('./../utils/AppError');
+const APIFeatures = require('./../utils/APIFeatures');
 
 
 
 // Handlers (CRUD)
 exports.getAllTours = async (req, res, next) => {
 
-    const tours = await Tour.find();
+    const urlQueryObj = new APIFeatures(req.query, Tour.find());
+    urlQueryObj.filter().sort().project().paginate();
+
+    const tours = await urlQueryObj.query;
     res.status(200).json({
         status : 'success',
         numTours : tours.length,
