@@ -1,4 +1,5 @@
 const express = require('express');
+const tourRouter = require('./routes/tourRoutes');
 
 
 
@@ -12,7 +13,7 @@ app.use(express.json());
 
 
 // (Route-specific)
-// app.use('/api/v1/tours');
+app.use('/api/v1/tours', tourRouter);
 
 
 
