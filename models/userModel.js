@@ -53,6 +53,11 @@ userSchema.pre('save', function(next) {
 
 
 
+// Attach methods
+userSchema.methods.matchPassword = async (password, encryptedPassword) => await bcrypt.compare(password, encryptedPassword);
+
+
+
 // Build Model
 const User = mongoose.model('User', userSchema);
 
